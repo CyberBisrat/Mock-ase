@@ -1,0 +1,38 @@
+version: '3'
+services:
+  exam-service:
+    build: ./exam_py
+
+  math-service:
+    build: ./math_py
+    depends_on:
+      - stats-service
+
+  stats-service:
+    build: ./stats_py
+    depends_on:
+      - stats_db
+
+  string-service:
+    build: ./string_rust
+    depends_on:
+      - stats-service
+
+  gateway:
+    build: ./gateway
+    ports:
+      - 5000:5000
+    depends_on:
+      - math-service
+      - string-service
+  
+  stats_db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: 'stats_db'
+      MYSQL_USER: 'stats'
+      MYSQL_PASSWORD: 'stats'
+      MYSQL_ROOT_PASSWORD: 'root_password'
+    ports:
+      # test only
+      - '3306:3306'
